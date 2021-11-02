@@ -1,0 +1,5 @@
+{% for host in ansible_play_hosts %}
+check filesystem rootfs with path /
+	if space usage > {{ monit_filesystem_space_usage_threshold_percent }}% for {{ monit_filesystem_space_usage_alert_cycle }} cycles then alert
+	if inode usage > {{ monit_filesystem_inode_usage_threshold_percent }}% for {{ monit_filesystem_inode_usage_alert_cycle }} cycles then alert
+{% endfor %}

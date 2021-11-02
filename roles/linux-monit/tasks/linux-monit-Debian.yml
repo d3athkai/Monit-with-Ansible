@@ -1,0 +1,86 @@
+---
+## Debian Monit
+
+  - name: Install Monit
+    apt:
+      name: monit
+      state: latest
+      update_cache: yes
+      autoclean: yes
+
+  - name: Get Monit version
+    shell: monit --version
+    register: monit_Version
+
+  - name: Show Monit version
+    debug: msg="{{ monit_Version.stdout_lines }}"
+
+  - name: Create local Monit configuration
+    template:
+      src: monitrc.j2
+      dest: /etc/monit/monitrc
+      owner: root
+      group: root
+      mode: '0600'
+
+  - name: Create Monit monitoring for Filesystem - Root
+    template:
+      src: rootfs.j2
+      dest: /etc/monit/conf.d/rootfs
+      owner: root
+      group: root
+      mode: '0600'
+    when: monit_filesystem_enabled | bool == true
+
+  - name: Create Monit monitoring for Network
+    template:
+      src: network.j2
+      dest: /etc/monit/conf.d/network
+      owner: root
+      group: root
+      mode: '0600'
+    when: monit_network_enabled | bool == true
+
+  - name: Create Monit monitoring for SSL
+    template:
+      src: ssl.j2
+      dest: /etc/monit/conf.d/ssl
+      owner: root
+      group: root
+      mode: '0600'
+    when: monit_ssl_enabled | bool == true
+
+  - name: Restart and enable Monit
+    systemd:
+      name: monit
+      state: restarted
+      enabled: yes
+
+
+  - name: Configure UFW for Monit web interface
+    block:
+    - name: Install UFW
+      apt:
+        name:
+        - ufw
+        state: present
+        autoclean: yes
+
+    - name: Start and enable UFW service
+      systemd:
+        name: ufw
+        state: started
+        enabled: yes
+
+    - name: Configure TCP Port for Monit web interface
+      community.general.ufw:
+        rule: allow
+        port: '{{ monit_web_interface_port }}'
+        proto: tcp
+        comment: Monit web interface
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+
+    when: monit_web_interface_external_access_enabled | bool == true

@@ -1,0 +1,47 @@
+---
+# defaults file for linux-monit
+
+### Monit Configurations ###
+
+# Cycle and Timing
+monit_one_cycle: 300 # set 1 cycle to be how many seconds
+monit_start_delay: 300 # delay startup in seconds
+
+# Web interface
+monit_web_interface_port: 2812 # default port is 2812
+monit_web_interface_user: <user>
+monit_web_interface_password: <password>
+monit_web_interface_external_access_enabled: false
+# If above option is set to true, configure below. Else ignore.
+monit_web_interface_subnet: 192.168.0.0/24 # specify subnet to allow access
+
+# Email
+monit_email_enabled: false
+# If above option is set to true, configure below. Else ignore.
+monit_email: <your-email>@email.com
+monit_email_alert_cycle: 12 # email alert after this amount of cycles
+
+
+### Monit Monitoring ###
+
+# Filesystem - Root
+monit_filesystem_enabled: true
+# If above option is set to true, configure below. Else ignore.
+monit_filesystem_space_usage_threshold_percent: 80
+monit_filesystem_space_usage_alert_cycle: 3
+monit_filesystem_inode_usage_threshold_percent: 90
+monit_filesystem_inode_usage_alert_cycle: 3
+
+# Network
+monit_network_enabled: true
+# If above option is set to true, configure below. Else ignore.
+monit_network_interface: eth0
+monit_network_saturation_percent: 90
+monit_network_upload_speed_threshold: "500 KB/s"
+monit_network_total_download_threshold: "10 GB"
+
+# SSL
+monit_ssl_enabled: false
+# If above option is set to true, configure below. Else ignore.
+monit_ssl_url: example.com
+monit_ssl_caertificate_valid_days: 10

@@ -1,0 +1,4 @@
+---
+# task file for linux-monit
+
+- include_tasks: linux-monit-{{ ansible_distribution }}.yml

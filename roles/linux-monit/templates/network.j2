@@ -1,0 +1,6 @@
+{% for host in ansible_play_hosts %}
+check network {{ monit_network_interface }} with interface {{ monit_network_interface }}
+	 if saturation > {{ monit_network_saturation_percent }}% then alert 
+	 if upload > {{ monit_network_upload_speed_threshold }} then alert
+	 if total downloaded > {{ monit_network_total_download_threshold }} in last day then alert
+{% endfor %}

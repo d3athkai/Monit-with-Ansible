@@ -1,0 +1,7 @@
+{% for host in ansible_play_hosts %}
+check host ssl with address {{ monit_ssl_url }}
+	if failed
+		certificate valid > {{ monit_ssl_caertificate_valid_days }} days
+		use ssl options {verify: enable}
+	then alert
+{% endfor %}

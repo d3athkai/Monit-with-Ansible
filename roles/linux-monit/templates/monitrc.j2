@@ -1,0 +1,57 @@
+{% for host in ansible_play_hosts %}
+set daemon {{ monit_one_cycle }}	# set 1 cycle to be how many seconds
+	with start delay {{ monit_start_delay }}	# delay startup in seconds
+
+set httpd port {{ monit_web_interface_port }}
+	allow localhost		# allow localhost to connect to the server
+	allow {{ monit_web_interface_user }}:{{ monit_web_interface_password }}	# username and password
+{% if monit_web_interface_external_access_enabled == true %}	allow {{ monit_web_interface_subnet }}	# allow subnet to access{% endif %}
+
+{% if monit_email_enabled == true %}
+set mailserver localhost
+set mail-format {
+	from: monit@$HOST
+	subject: [Monit] $HOST - $SERVICE - $ACTION - $EVENT
+	message: $DESCRIPTION
+}
+set alert {{ monit_email }} with reminder on {{ monit_email_alert_cycle }} cycles
+{% endif %}
+
+set log /var/log/monit.log
+
+{% if ansible_distribution == "Ubuntu" %}
+set idfile /var/lib/monit/id
+{% endif %}
+{% if ansible_distribution == "Debian" %}
+set idfile /var/lib/monit/id
+{% endif %}
+{% if ansible_distribution == "CentOS" %}
+set idfile /root/.monit.id
+{% endif %}
+
+{% if ansible_distribution == "Ubuntu" %}
+set statefile /var/lib/monit/state
+{% endif %}
+{% if ansible_distribution == "Debian" %}
+set statefile /var/lib/monit/state
+{% endif %}
+{% if ansible_distribution == "CentOS" %}
+set statefile /root/.monit.state
+{% endif %}
+
+set eventqueue
+	basedir /var/lib/monit/events # set the base directory where events will be stored
+	slots 1000                    # optionally limit the queue size
+
+{% if ansible_distribution == "Ubuntu" %}
+include /etc/monit/conf.d/*
+include /etc/monit/conf-enabled/*
+{% endif %}
+{% if ansible_distribution == "Debian" %}
+include /etc/monit/conf.d/*
+include /etc/monit/conf-enabled/*
+{% endif %}
+{% if ansible_distribution == "CentOS" %}
+include /etc/monit.d/*
+{% endif %}
+{% endfor %}

@@ -1,0 +1,70 @@
+---
+## CentOS Monit
+
+  - name: Install EPEL Repo
+    yum:
+      name: epel-release
+      state: latest
+      update_cache: yes
+
+  - name: Install Monit
+    yum:
+      name: monit
+      state: latest
+      update_cache: yes
+
+  - name: Get Monit version
+    shell: monit --version
+    register: monit_Version
+
+  - name: Show Monit version
+    debug: msg="{{ monit_Version.stdout_lines }}"
+
+  - name: Create local Monit configuration
+    template:
+      src: monitrc.j2
+      dest: /etc/monitrc
+      owner: root
+      group: root
+      mode: '0600'
+
+  - name: Create Monit monitoring for Filesystem - Root
+    template:
+      src: rootfs.j2
+      dest: /etc/monit.d/rootfs
+      owner: root
+      group: root
+      mode: '0600'
+    when: monit_filesystem_enabled | bool == true
+
+  - name: Create Monit monitoring for Network
+    template:
+      src: network.j2
+      dest: /etc/monit.d/network
+      owner: root
+      group: root
+      mode: '0600'
+    when: monit_network_enabled | bool == true
+
+  - name: Create Monit monitoring for SSL
+    template:
+      src: ssl.j2
+      dest: /etc/monit.d/ssl
+      owner: root
+      group: root
+      mode: '0600'
+    when: monit_ssl_enabled | bool == true
+
+  - name: Restart and enable Monit
+    systemd:
+      name: monit
+      state: restarted
+      enabled: yes
+
+
+  - name: Configure TCP Port for Monit web interface
+    firewalld:
+      port: 2812/tcp
+      permanent: yes
+      state: enabled
+    when: monit_web_interface_external_access_enabled | bool == true
