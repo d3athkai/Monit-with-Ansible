@@ -1,0 +1,19 @@
+###
+###
+# Linux Monit
+#
+#
+# Changelogs:
+# - v1: 02/11/2021 - initial release
+#
+# Execute command:
+# ansible-playbook linux-monit.yml
+###
+###
+---
+- name: Linux Monit
+  hosts: test
+  become: yes
+  become_user: root
+  roles:
+  - linux-monit
